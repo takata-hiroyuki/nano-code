@@ -88,14 +88,14 @@ export function createOpenAI(config?: {
                 // 3.SDKの応答を統一型に変更
                 const choice = completion.choices[0];
                 if (!choice) {
-                    throw new LLMApiError('APIから応答がありません');
+                    throw new LLMApiError(500,'OpenAI','APIから応答がありません');
                 }
                 const message = choice.message;
 
                 const toolCalls: ToolCall[] | undefined = message.tool_calls?.map(
                     (tc) => ({
                         toolCallId: tc.id,
-                        name: tc.function!.name,
+                        name: tc.function.name,
                         args: JSON.parse(tc.function.arguments),
                     })
                 );
