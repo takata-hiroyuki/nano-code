@@ -1,7 +1,7 @@
 import { test, expect, mock, afterAll } from 'bun:test';
-import { createOpenAI } from './openai.ts';
+import { createOpenAI } from '../../providers/openai.ts';
 import type { Message, Tool } from '../types.ts';
-import { LLMApiError } from '../types.ts';
+import { LLMApiError } from '../../types.ts';
 
 // OpenAI SDK をモック
 const mockCreate = mock(() => Promise.resolve({

@@ -1,7 +1,7 @@
 import { test, expect, afterAll } from 'bun:test';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { readFile } from './readFile.ts';
+import { readFile } from '../../tools/readFile.ts';
 
 const workspaceRoot = path.resolve(process.cwd(), './workspace');
 const testFilePath = path.join(workspaceRoot, 'readFile.test.txt');

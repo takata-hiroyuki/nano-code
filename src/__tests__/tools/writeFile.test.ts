@@ -1,7 +1,7 @@
 import { test, expect, afterAll } from 'bun:test';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { writeFile } from './writeFile.ts';
+import { writeFile } from '../../tools/writeFile.ts';
 
 const workspaceRoot = path.resolve(process.cwd(), './workspace');
 const testFilePath = path.join(workspaceRoot, 'writeFile.test.txt');
