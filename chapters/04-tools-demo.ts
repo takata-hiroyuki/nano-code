@@ -51,6 +51,10 @@ async function demo() {
         console.log(`   期待通りのエラー: ${error.message}\n`);
     }
 
+    console.log('8. execCommand: ホワイトリスト以外のコマンド実行');
+    const pwdResult = await execCommand.execute({ command: 'pwd'});
+    console.log(`   結果：${pwdResult}\n`);
+
     console.log('====動作確認終了====')
 }
 
