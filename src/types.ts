@@ -1,7 +1,8 @@
 // ツール定義の型
-export type Tool = {
+export interface Tool {
     name: string;
     description: string;
+    needsApproval: boolean;
     parameters: Record<string, unknown>; // JSON Schema相当
     execute: (args: Record<string, unknown>) => Promise<string>;
 };

@@ -5,7 +5,7 @@ import * as path from 'path';
 const WORKSPACE_ROOT = path.resolve(process.cwd(), './workspace');
 
 // 許可されたコマンド
-const ALLOWED_COMMANDS = ['bun', 'ls', 'git', 'gh']
+const ALLOWED_COMMANDS = ['bun', 'ls', 'cat', 'grep', 'find', 'pwd', 'mkdir', 'git', 'gh'];
 
 // 出力サイズの上限（文字数）
 const MAX_OUTPUT_LENGTH = 2048;
@@ -151,6 +151,7 @@ async function execCommandExecute(args: {command: string}): Promise<string>{
 export const execCommand = {
     name: 'execCommand',
     description: "ワークスペース内で許可された汎用コマンドを実行する。利用可能なコマンドはbun、ls、cat、grep、find、pwd、mkdir、git、ghに限定される。コマンド連結や置換を防止するため、& ; ` $ などの文字を含むコマンドは拒否される。コマンド引数にパスが含まれる場合はワークスペース内に限定される。出力は最大2048文字までで、それを超える場合は切り捨てられる。",
+    needsApproval: true,
     parameters: {
         type: 'object',
         properties: {
