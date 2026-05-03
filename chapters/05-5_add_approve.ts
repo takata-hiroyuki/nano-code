@@ -10,7 +10,11 @@ import  type { Tool } from "../src/types";
 import { requestApproval } from "../src/core/approval";
 
 async function executeTool(tool: Tool, args: any): Promise<string>{
-    return await tool.execute(args);
+    try {
+        return await tool.execute(args);
+    } catch (error: any){
+        return `エラー：　${error.message}`; // エージェントを止めないためにエラーは投げない
+    }
 }
 
 async function generate(userMessage: string): Promise<string> {
@@ -89,4 +93,4 @@ async function generate(userMessage: string): Promise<string> {
     return finalText;
 }
 
-await generate("typescript.mdのタイトルを大文字にして");
+await generate("python.mdの中身を教えて");
