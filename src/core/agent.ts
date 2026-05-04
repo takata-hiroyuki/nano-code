@@ -102,28 +102,32 @@ export class Agent{
                             });
                             continue;
                         }
-                        const result = await executeTool(tool, toolCall.args);
-                        toolCallCount++;
-                        if (this.verbose) console.log(`[結果]${result.slice(0, 200)} ${result.length > 200 ? '...' : ''}`);
-                        messages.push({
-                            role: 'tool',
-                            toolCallId: toolCall.toolCallId,
-                            name: toolCall.name,
-                            content: result
-                        });
                     }
-                    continue;
+                    // ツールを実行
+                    const result = await executeTool(tool, toolCall.args);
+                    toolCallCount++;
+                    if (this.verbose) console.log(`[結果]${result.slice(0, 200)} ${result.length > 200 ? '...' : ''}`);
+                    messages.push({
+                        role: 'tool',
+                        toolCallId: toolCall.toolCallId,
+                        name: toolCall.name,
+                        content: result
+                    });
                 }
-                // ツール呼び出しがない場合は終了
-                messages.push({
-                    role: 'assistant',
-                    content: response.text,
-                });
-                break;
+                continue;
             }
+            // ツール呼び出しがない場合は終了
+            messages.push({
+                role: 'assistant',
+                content: response.text,
+            });
+            //continue;
+            break;
+        }
+        
         if( currentStep >= this.maxSteps) console.warn('警告: 最大ステップ数に達しました。');
         if( toolCallCount === 0 && currentStep === 1) console.warn('警告: ツールが一度も使用されずに終了しました');
-        }
+        
     return { text: finalText};
     }
 }
