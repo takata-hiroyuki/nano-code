@@ -1,6 +1,7 @@
 import { generateText } from "./generate-text";
 import { requestApproval } from "./approval";
 import type { Message, Tool, LanguageModel } from './../types';
+import { Messages } from "@anthropic-ai/sdk/resources.js";
 
 export interface AgentConfig{
     name: string;
@@ -46,7 +47,7 @@ export class Agent{
     }
 
     async generate(userPrompt: string): Promise<{ text: string}> {
-        const messages: Message[] = [
+        let messages: Message[] = [
             { role: 'system', content: this.instructions },
             { role: 'user', content: userPrompt }
         ];
@@ -57,6 +58,8 @@ export class Agent{
 
         while ( currentStep < this.maxSteps) {
             currentStep++;
+            messages = this.manageContext(messages); // コンテキスト管理（圧縮）
+
             if(this.verbose) console.log(`\n===ステップ${currentStep}/${this.maxSteps} ===`);
 
             const response = await generateText({
@@ -124,10 +127,55 @@ export class Agent{
             //continue;
             break;
         }
-        
+
         if( currentStep >= this.maxSteps) console.warn('警告: 最大ステップ数に達しました。');
         if( toolCallCount === 0 && currentStep === 1) console.warn('警告: ツールが一度も使用されずに終了しました');
         
     return { text: finalText};
+    }
+
+    /**
+     * コンテキストサイズを管理し、制限を超えそうな場合に履歴を削除する
+     */
+    private manageContext (messages: Message[]): Message[]{
+        // 簡易的な制限：文字数で判定（例：30,000文字　＝　10-15kトークンと仮定）
+        // 使用するモデルのコンテキストウィンドウに合わせて調整
+        const CHAR_LIMIT = 30000;
+        let totalLength = messages.reduce((sum, m) => sum + m.content.length, 0);
+
+        if (totalLength < CHAR_LIMIT) return messages;
+
+        console.log(`\n[Context]会話履歴を圧縮します。(現在：${totalLength}文字)`);
+        // 守るべき文字列を確保
+        const systemMessage = messages[0];
+        if(!systemMessage) return messages;
+        // 直近の４メッセージ
+        const recentMessages = messages.slice(-4);
+        // 圧縮対象の中間メッセージ
+        let middleMessages = messages.slice(1, -4);
+
+        // 古いツール実行結果を「省略」に置換
+        // readFileの結果などが巨大になりがちなので、これを削るのが効果的
+        middleMessages = middleMessages.map(msg => {
+            if (msg.role === 'tool' && msg.content.length > 200) {
+                return{
+                    ...msg,
+                    content: `(以前のツール実行結果は省略されました：${msg.content.length}文字)`
+                };
+            }
+            return msg;
+        });
+
+        // それでも溢れるなら、古い順に削除
+        totalLength = systemMessage.content.length + 
+                        middleMessages.reduce((sum, m) => sum + m.content.length, 0) +
+                        recentMessages.reduce((sum, m) => sum + m.content.length, 0);
+        while (totalLength > CHAR_LIMIT && middleMessages.length > 0) {
+            const removed = middleMessages.shift(); // 古い順から削除
+            if(removed) totalLength -= removed.content.length;
+        }
+
+        // 再構築
+        return [ systemMessage, ...middleMessages, ...recentMessages];
     }
 }
