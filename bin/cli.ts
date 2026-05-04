@@ -6,6 +6,8 @@ import { readFile } from '../src/tools/readFile';
 import { writeFile } from '../src/tools/writeFile';
 import { editFile } from '../src/tools/editFile';
 import { execCommand } from '../src/tools/execCommand';
+import { parseArgs } from 'util';
+import { config } from 'process';
 
 async function main() {
     const args = process.argv.slice(2);
@@ -19,9 +21,20 @@ async function main() {
     const workspaceRoot = path.resolve(process.cwd(), 'workspace');
     const instructions = loadInstructions(workspaceRoot);
 
+    // 自動承認モード（yolo）追加
+    const { values } = parseArgs({
+        args: process.argv.slice(2),
+        options: {
+            'yolo' : { type: 'boolean', default: false },
+        },
+        allowPositionals: true,
+    })
+    const yoloMode = values['yolo'];
+
     const agent = new Agent({
         name: 'nano-code',
         model,
+        //instructions: yoloMode ? ciInstructions: defaultInstructions,
         instructions,
         tools: {
             readFile,
@@ -30,6 +43,7 @@ async function main() {
             execCommand,
         },
         maxSteps: 15,
+        approveFunc: yoloMode ? async () => true : undefined,
         verbose: true,
     });
 
