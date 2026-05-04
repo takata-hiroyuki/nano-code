@@ -23,7 +23,7 @@ jobs:
       - run: bun install
       - name: Git ユーザーを設定
         run: |
-          git config.user.name "nano-code[bot]"
+          git config user.name "nano-code[bot]"
           git config user.email "nano-code[bot]@users.noreply.github.com"
       - name: Nano Codeを実行
         env:
