@@ -32,4 +32,4 @@ jobs:
           LLM_MODEL: ${{ vars.LLM_MODEL }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           ISSUE_BODY: ${{ inputs.task }}
-        run: bun run agent --yolo
+        run: bun run agent --yolo "${{ inputs.task }}"
