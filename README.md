@@ -1,6 +1,8 @@
 # Nano Code 🤖
 
-**書籍「作って学ぶAIエージェント」学習プロジェクト**
+**書籍[作って学ぶAIエージェント](https://gihyo.jp/book/2026/978-4-297-15565-0)学習プロジェクト**
+
+![書籍カバー](images/作って学ぶAIエージェント.jpg)
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Bun](https://img.shields.io/badge/Bun-F9F1E1?logo=bun&logoColor=000)](https://bun.sh/)
@@ -249,7 +251,7 @@ bun run lint
 
 ## 📚 関連書籍
 
-- [**作って学ぶAIエージェント**](https://example.com) - このプロジェクトの基盤となる書籍
+- [**作って学ぶAIエージェント**](https://gihyo.jp/book/2026/978-4-297-15565-0) - このプロジェクトの基盤となる書籍
 
 ---
 
