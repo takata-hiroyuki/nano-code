@@ -22,3 +22,6 @@ ENV BUN_INSTALL_CACHE_DIR=/home/vscode/.bun/cache
 RUN mkdir -p $BUN_INSTALL_CACHE_DIR
 
 CMD ["bash"]
+
+RUN apt-get update && apt-get install -y --no-install-recommends bubblewrap \
+&& apt-get clean && rm -rf /var/lib/apt/lists/*

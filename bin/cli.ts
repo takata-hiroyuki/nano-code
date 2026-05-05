@@ -7,7 +7,7 @@ import { writeFile } from '../src/tools/writeFile';
 import { editFile } from '../src/tools/editFile';
 import { execCommand } from '../src/tools/execCommand';
 import { parseArgs } from 'util';
-import { config } from 'process';
+import { config } from '../src/config'
 
 async function main() {
     const args = process.argv.slice(2);
@@ -22,13 +22,17 @@ async function main() {
     const instructions = loadInstructions(workspaceRoot);
 
     // 自動承認モード（yolo）追加
-    const { values } = parseArgs({
+    const { values, positionals } = parseArgs({
         args: process.argv.slice(2),
         options: {
             'yolo' : { type: 'boolean', default: false },
+            'sandbox': { type: 'boolean', default: false },
+            'allowed-domains': { type: 'string'},
         },
         allowPositionals: true,
-    })
+    });
+    config.sandbox = values['sandbox'] ?? false;
+    if (values['allowed-domains']) config.allowedDomains.push(...values['allowed-domains'].split(','));
     const yoloMode = values['yolo'];
 
     const agent = new Agent({
