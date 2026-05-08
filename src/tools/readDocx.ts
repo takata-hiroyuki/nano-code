@@ -1,9 +1,14 @@
 import JSZip from 'jszip';
 import { parseStringPromise } from 'xml2js';
 import * as path from 'path';
+import * as fs from 'fs/promises';
 
 export type ViewerResult<T> = { ok: true; value: T } | { ok: false; error: string };
 const WORKSPACE_ROOT = path.resolve(process.cwd(), './workspace');
+
+// 読み込み可能なファイルサイズの上限（1MB）
+const MAX_FILE_SIZE = 1 * 1024 * 1024;
+
 /**
  * 
  * @param url 
@@ -12,6 +17,30 @@ const WORKSPACE_ROOT = path.resolve(process.cwd(), './workspace');
 
 async function readDocxExecute(args: {path: string}): Promise<string>{
     const absolutePath = path.resolve(WORKSPACE_ROOT, args.path);
+    // ワークスペース内かチェック（ディレクトリトラバーサル対策）
+    const allowedPrefix = WORKSPACE_ROOT + path.sep;
+    if (!absolutePath.startsWith(allowedPrefix) && absolutePath !== WORKSPACE_ROOT){
+        throw new Error(`アクセス拒否：　${args.path}はワークスペース外です。`);
+    }
+
+    // シンボリックリンクを解決して実パスを検証
+    const realPath = await fs.realpath(absolutePath);
+    if (!realPath.startsWith(allowedPrefix) && realPath !== WORKSPACE_ROOT){
+        throw new Error(`アクセス拒否：　${args.path}はシンボリック経由でワークスペース外を参照しています。`);
+    } 
+
+    // ファイルサイズと種類のチェック
+    try {
+        const stat = await fs.stat(absolutePath);
+        if (!stat.isFile()) throw new Error(`通常のファイルではありません：　${args.path}`);
+        if (stat.size > MAX_FILE_SIZE) throw new Error(
+            `ファイルサイズが大きすぎます（${stat.size} bytes）。最大許容サイズは ${MAX_FILE_SIZE} bytes です。`
+        );
+    } catch (error: any) {
+        if (error.code === 'ENOENT') throw new Error(`ファイルが見つかりません：　${args.path}`);
+        throw error;
+    }
+
     try {
         const buffer = await Bun.file(absolutePath).arrayBuffer();
         const bytes = new Uint8Array(buffer);
