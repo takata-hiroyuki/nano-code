@@ -5,6 +5,7 @@ import { createModelFromEnv } from '../src/providers/modelFactory';
 import { readFile } from '../src/tools/readFile';
 import { writeFile } from '../src/tools/writeFile';
 import { editFile } from '../src/tools/editFile';
+import { readDocx } from '../src/tools/readDocx';
 import { execCommand } from '../src/tools/execCommand';
 import { parseArgs } from 'util';
 import { config } from '../src/config'
@@ -44,6 +45,7 @@ async function main() {
             readFile,
             writeFile,
             editFile,
+            readDocx,
             execCommand,
         },
         maxSteps: 15,

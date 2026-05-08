@@ -16,6 +16,8 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.92.0",
     "@google/genai": "^1.51.0",
-    "openai": "^6.35.0"
+    "jszip": "^3.10.1",
+    "openai": "^6.35.0",
+    "xml2js": "^0.6.2"
   }
 }
